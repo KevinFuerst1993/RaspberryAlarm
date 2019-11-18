@@ -1,6 +1,7 @@
  <?php
    $home="/home/pi/alarm/";
    //system($home."light/all_off" ); system($home."light/all_off");
+   //a comment
    $con=new mysqli("localhost","alarm","alarm","alarm");
    if(!$con){ die ("Database Connect failed"); }
    $sql="select * from alarm where ts < now() order by ts asc";
