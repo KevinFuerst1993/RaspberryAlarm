@@ -7,15 +7,39 @@
     </form>
 
 <?php
+// Enable error print for debug purposes
+error_reporting(-1);
+ini_set('display_errors','On');
+
 $con=new mysqli("localhost","alarm","alarm","alarm");
+
+$logFile = fopen("/var/www/html/phpLog","a");
+$timeStamp = date("Y-m-d H:i:s");
+fwrite($logFile, "setalarm.php executed at: $timeStamp\n");
+
 if(isset($_POST['save'])){
     $ts=$_POST['ts'];
     $sound=$_POST['sound'];
     $light=$_POST['light'];
-    if(!$con){die ("Database Connect failed");}
+    
+    if(!$con)
+	{
+		fwrite($logFile,"\tfailed to connect to database\n");
+		fclose($logFile);
+		die ("Database Connect failed");
+	}
     $sql="insert into alarm (ts,sound,light) values('".$ts."','".$sound."','".$light."')";
-    if($con->query($sql)===false){echo $con->error;}
+    if($con->query($sql)===false)
+    {
+		fwrite($logFile,"\tfailed to insert database entry\n");
+		echo $con->error;
+	}
+	else
+	{
+		fwrite($logFile, "\tnew alarm added: $ts\n");
+	}
 }    
+fclose($logFile);
 
 $sql="select * from alarm order by ts asc";
 $result = $con->query($sql);

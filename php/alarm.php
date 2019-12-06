@@ -5,17 +5,15 @@ ini_set('display_errors','On');
 
 //open log file
 $logFile = fopen("/var/www/html/phpLog","a");
-
-fwrite($logFile, "alarm.php executed at: ");
 $timeStamp = date("Y-m-d H:i:s");
-fwrite($logFile, $timeStamp);
-fwrite($logFile,"\n");
+fwrite($logFile, "alarm.php executed at: $timeStamp\n");
    
 $home="/home/pi/alarm/";
 $con=new mysqli("localhost","alarm","alarm","alarm");
 if(!$con)
 { 
-	fwrite($logFile, "Database Conncet failed");
+	fwrite($logFile,"\tfailed to connect to database\n");
+	fclose($logFile);
 	die ("Database Connect failed");
 }
 $sql="select * from alarm where ts < now() order by ts asc";
@@ -23,7 +21,7 @@ $result = $con -> query($sql);
 $row = $result->fetch_assoc();
 if ($row["id"]) 
 {
-	fwrite($logFile, "alarm time reached\n");
+	fwrite($logFile, "\talarm time reached\n");
 	fclose($logFile);
 	system('/usr/bin/nohup /usr/bin/ogg123 '.$home."sound/".$row["sound"].'>/dev/null  &' );
 	system('/usr/bin/nohup '.$home."light/".$row["light"].'>/dev/null  &' );
